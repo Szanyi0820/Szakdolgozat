@@ -9,12 +9,22 @@ public class Fighter : MonoBehaviour
     private float nextFireTime = 0f;
     public static int noOfClicks = 0;
     float lastClickedTime = 0;
-    double maxComboDelay = 1.4;
-    
+    double maxComboDelay = 1.55;
+    private Collider swordCollider;
  
     private void Start()
     {
         anim = GetComponent<Animator>();
+        swordCollider = GetComponentInChildren<MeshCollider>();
+        if (swordCollider != null)
+{
+    swordCollider.enabled = false;
+}
+else
+{
+    Debug.LogError("No MeshCollider found on the sword!");
+}
+        
     }
     void Update()
     {
@@ -29,7 +39,7 @@ public class Fighter : MonoBehaviour
  
         if (Time.time - lastClickedTime > maxComboDelay)
         {
-            noOfClicks = 0;
+            ResetCombo();
         }
         if (noOfClicks == 3 && anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f )
         {
@@ -54,6 +64,8 @@ public class Fighter : MonoBehaviour
         anim.SetBool("hit1", false);
         anim.SetBool("hit2", false);
         anim.SetBool("hit3", false);
+        
+        
     }
     void OnClick()
     {
@@ -69,6 +81,7 @@ public class Fighter : MonoBehaviour
             anim.SetBool("hit2", false);
             anim.SetBool("hit3", false);
             
+            
         }
         
  
@@ -76,6 +89,8 @@ public class Fighter : MonoBehaviour
         {
             anim.SetBool("hit1", false);
             anim.SetBool("hit2", true);
+           
+            
         }
         if (noOfClicks >= 3  )
         {
@@ -85,6 +100,27 @@ public class Fighter : MonoBehaviour
             if(!anim.IsInTransition(0)&&stateInfo.IsName("hit3")){
                 noOfClicks=0;
             }
+            
         }
+    }
+    private HashSet<GameObject> hitEnemies = new HashSet<GameObject>();
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy")&& (anim.GetBool("hit1")==true||anim.GetBool("hit2")==true||anim.GetBool("hit3")==true)&& !hitEnemies.Contains(other.gameObject)) // Make sure your enemy has the tag "Enemy"
+        {
+            hitEnemies.Add(other.gameObject);
+            Debug.Log("Hit Enemy!");
+            other.GetComponent<Enemy>().TakeDamage(30); // Call damage function
+        }
+    }
+    public void EnableHitbox()
+    {
+        swordCollider.enabled = true;
+        hitEnemies.Clear(); // Reset hit list when attack starts
+    }
+    public void DisableHitbox()
+    {
+        swordCollider.enabled = false;
+        Debug.Log("sword off");
     }
 }

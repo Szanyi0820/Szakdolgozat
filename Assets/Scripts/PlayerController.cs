@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
     //[SerializeField] GameObject key,chest_open,chest_closed;
     //[SerializeField] TextMeshProUGUI VictoryText;
     //private GameManager gameManager;
-    Animator anim;
+    public Animator anim;
     Rigidbody rb;
     
     
@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+         //rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         //key.gameObject.SetActive(false);
         //VictoryText.gameObject.SetActive(false);
         //gameManager = FindObjectOfType<GameManager>();
@@ -32,11 +33,27 @@ public class PlayerController : MonoBehaviour
     {
         ControllPlayer();
     }
+    
+
     IEnumerator Varakozas2(){
         //key.gameObject.SetActive(true);
         yield return new WaitForSeconds(3);
                 //key.gameObject.SetActive(false);
 }
+private bool IsCurrentAnimation(string animationName)
+{
+    AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0); // 0 is the base layer index
+    return stateInfo.IsName(animationName);
+}
+private bool CanMove()
+    {
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+        bool isWalking = stateInfo.IsName("Walk")||stateInfo.IsName("Idle")||stateInfo.IsName("Run");
+        
+        
+        
+        return isWalking ;
+    }
 
     void ControllPlayer()
     {
@@ -60,42 +77,39 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = (forward * moveVertical + right * moveHorizontal).normalized;
 
         // Movement and animation handling
-        if (movement != Vector3.zero)
+        if (movement != Vector3.zero&& (anim.GetBool("hit1")==false&&anim.GetBool("hit2")==false&&anim.GetBool("hit3")==false)&&CanMove())
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), 0.15f);
             anim.SetBool("isWalking", true);
+            
         }
         else
         {
             anim.SetBool("isWalking", false);
+            movementSpeed=0;
         }
-
+            transform.Translate(movement * movementSpeed * Time.deltaTime, Space.World);   
         // Move the player in world space
-        transform.Translate(movement * movementSpeed * Time.deltaTime, Space.World);
+        
 
         // Jump handling
-        if (Input.GetButtonDown("Jump") && Time.time > canJump)
+        if (Input.GetKeyDown(KeyCode.F) && Time.time > canJump)
         {
             rb.AddForce(0, jumpForce, 0);
             canJump = Time.time + timeBeforeNextJump;
             anim.SetTrigger("jump");
         }
-    }
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Key"))
-    {
-//kulcs=true;
-//Destroy(key);
-    }
-    if (other.CompareTag("Chest")){
-       /* if (kulcs){
-            //chest_closed.gameObject.SetActive(false);
-//chest_open.gameObject.SetActive(true);
-VictoryText.gameObject.SetActive(true);
-//gameManager.StopAllCoroutines();*/
-StopAllCoroutines();
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            anim.SetBool("isRunning",true);
+            movementSpeed=3;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), 0.15f);
+        }
+        else {
+            anim.SetBool("isRunning",false);
+            movementSpeed=2;
         }
     }
+
     
 }
