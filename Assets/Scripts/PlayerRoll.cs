@@ -43,19 +43,20 @@ public class PlayerRoll : MonoBehaviour
 
         // Make the player invincible during the roll
         //DetermineRollDirection();
-        //TriggerRollAnimation();
 
+        FaceCameraDirection();
         // Trigger the roll animation
-        anim.SetTrigger("RollForward");
+        //anim.SetTrigger("RollForward");
 
-        
+
 
         // Perform the roll movement (move the player forward)
-          // You can also use a direction vector if needed
-          
+        // You can also use a direction vector if needed
+
         float startTime = Time.time;
-        Vector3 rollDirection = transform.forward;
-        
+        Vector3 rollDirection = DetermineRollDirection();
+        TriggerRollAnimation();
+
         // Move the player during the roll
         while (Time.time - startTime < 0.5f)  // Adjust this duration based on your roll animation length
         {
@@ -75,62 +76,93 @@ public class PlayerRoll : MonoBehaviour
         // Make the player not invincible anymore
         
     }
-    /*private void DetermineRollDirection()
+    private void FaceCameraDirection()
+    {
+        Vector3 cameraForward = playerCamera.transform.forward;
+        cameraForward.y = 0f; // Ignore vertical rotation
+        cameraForward.Normalize();
+
+        // Rotate the character to match camera direction
+        transform.forward = cameraForward;
+    }
+    /*private Vector3 GetRollDirection()
+    {
+        // Here, we detect the player's movement input (e.g., WASD or arrow keys)
+        // You can use Input.GetAxis for movement or detect the direction based on input keys
+
+        float horizontal = Input.GetAxis("Horizontal"); // A/D or Left/Right arrow keys
+        float vertical = Input.GetAxis("Vertical"); // W/S or Up/Down arrow keys
+
+        // Get the direction vector based on input
+        Vector3 inputDirection = new Vector3(horizontal, 0f, vertical).normalized;
+
+        // If there is no input, default to the forward direction
+        if (inputDirection.magnitude == 0)
+        {
+            inputDirection = transform.forward;
+        }
+
+        return inputDirection;
+    }*/
+    private Vector3 DetermineRollDirection()
     {
         // Get the character's forward and right directions in world space
-        Vector3 characterForward = transform.forward;
-        Vector3 characterRight = transform.right;
+        float horizontal = Input.GetAxis("Horizontal"); // A/D or Left/Right arrow keys
+        float vertical = Input.GetAxis("Vertical"); // W/S or Up/Down arrow keys
 
-        // Normalize the vectors to avoid scaling issues
-        characterForward.y = 0;
-        characterRight.y = 0;
-        characterForward.Normalize();
-        characterRight.Normalize();
+        // Get the custom camera's forward and right directions
+        Vector3 cameraForward = playerCamera.transform.forward;
+        Vector3 cameraRight = playerCamera.transform.right;
 
-        // Get the player's input direction (WASD or arrow keys)
-        float horizontal = Input.GetAxisRaw("Horizontal"); // A/D or Left/Right
-        float vertical = Input.GetAxisRaw("Vertical");     // W/S or Up/Down
+        // Flatten the directions on the X-Z plane (ignore the Y axis)
+        cameraForward.y = 0f;
+        cameraRight.y = 0f;
 
-        // Calculate the roll direction based on character's facing direction
-        if (vertical > 0) // Forward (W key)
+        // Normalize the directions
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        // Calculate the roll direction based on the input and camera orientation
+        Vector3 inputDirection = cameraForward * vertical + cameraRight * horizontal;
+
+        // Normalize the input direction to prevent faster diagonal movement
+        if (inputDirection.magnitude > 0f)
         {
-            rollDirection = characterForward; // Roll forward in the direction the character is facing
+            inputDirection.Normalize();
         }
-        else if (vertical < 0) // Backward (S key)
+        else
         {
-            rollDirection = -characterForward; // Roll forward in the direction the character is facing, even if pressing S (as in walking or rolling toward the camera)
+            inputDirection = cameraForward;  // Default to forward if no input
         }
-        else if (horizontal > 0) // Right (D key)
-        {
-            rollDirection = characterRight; // Roll to the right relative to the character
-        }
-        else if (horizontal < 0) // Left (A key)
-        {
-            rollDirection = -characterRight; // Roll to the left relative to the character
-        }
+
+        return inputDirection;
     }
 
     private void TriggerRollAnimation()
     {
         // Trigger roll animation based on the direction of the roll
-        if (rollDirection == transform.forward)
+        //if (rollDirection == playerCamera.transform.forward)
+        if(Input.GetKey(KeyCode.W))
         {
             anim.SetTrigger("RollForward");
         }
-        else if (rollDirection == -transform.forward)
+        //else if (rollDirection == -playerCamera.transform.forward)
+        else if (Input.GetKey(KeyCode.S))
         {
             anim.SetTrigger("RollBackward");
         }
-        else if (rollDirection == transform.right)
+        else if (Input.GetKey(KeyCode.D))
+        //else if (rollDirection == playerCamera.transform.right)
         {
             anim.SetTrigger("RollRight");
         }
-        else if (rollDirection == -transform.right)
+        //else if (rollDirection == -playerCamera.transform.right)
+        else if (Input.GetKey(KeyCode.A))
         {
             anim.SetTrigger("RollLeft");
         }
-    }*/
+    }
 
     // Call this function to detect if the player is hit (you would typically call this in a OnCollisionEnter or OnTriggerEnter)
-    
+
 }
