@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -17,13 +18,23 @@ public class PlayerController : MonoBehaviour
     //private GameManager gameManager;
     public Animator anim;
     Rigidbody rb;
-    
-    
+    public float maxStamina = 100;
+    public float currentStamina;
+    public float staminaDrainRate = 15f; // Per second
+    public float staminaRegenRate = 10f; // Per second
+    public float regenDelay = 1f;
+    private float lastStaminaUseTime;
+    public Slider staminaBar;
+
+
     void Start()
     {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
-         //rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        currentStamina = maxStamina;
+        if (staminaBar)
+            staminaBar.maxValue = maxStamina;
+        //rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         //key.gameObject.SetActive(false);
         //VictoryText.gameObject.SetActive(false);
         //gameManager = FindObjectOfType<GameManager>();
@@ -32,6 +43,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         ControllPlayer();
+        RegenerateStamina();
     }
     
 
@@ -93,16 +105,18 @@ private bool CanMove()
         
 
         // Jump handling
-        if (Input.GetKeyDown(KeyCode.F) && Time.time > canJump)
+        if (Input.GetKeyDown(KeyCode.F) && Time.time > canJump && currentStamina >= 20)
         {
             rb.AddForce(0, jumpForce, 0);
             canJump = Time.time + timeBeforeNextJump;
             anim.SetTrigger("jump");
+            DrainStamina(20);
         }
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift) && currentStamina > 0)
         {
             anim.SetBool("isRunning",true);
             movementSpeed=3;
+            DrainStamina(staminaDrainRate * Time.deltaTime);
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), 0.15f);
         }
         else {
@@ -110,6 +124,24 @@ private bool CanMove()
             movementSpeed=2;
         }
     }
+    public void DrainStamina(float amount)
+    {
+        currentStamina = Mathf.Max(0, currentStamina - amount);
+        lastStaminaUseTime = Time.time;
 
-    
+        if (staminaBar)
+            staminaBar.value = currentStamina;
+    }
+    public void RegenerateStamina()
+    {
+        if (Time.time > lastStaminaUseTime + regenDelay && currentStamina < maxStamina)
+        {
+            currentStamina = Mathf.Min(maxStamina, currentStamina + staminaRegenRate * Time.deltaTime);
+
+            if (staminaBar)
+                staminaBar.value = currentStamina;
+        }
+    }
+
+
 }

@@ -2541,6 +2541,12 @@ MonoBehaviour:
   timeBeforeNextJump: 0
   cameraTransform: {fileID: 113350497}
   anim: {fileID: 594720642}
+  maxStamina: 100
+  currentStamina: 0
+  staminaDrainRate: 15
+  staminaRegenRate: 10
+  regenDelay: 1
+  staminaBar: {fileID: 1153439380}
 --- !u!54 &594720641
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2631,6 +2637,7 @@ MonoBehaviour:
   rollCooldown: 0.2
   isInvincible: 0
   playerCamera: {fileID: 113350500}
+  rollStaminaCost: 25
 --- !u!114 &594720646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2638,7 +2645,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 594720637}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af4d73379e19ff64b91d7bb457092b77, type: 3}
   m_Name: 

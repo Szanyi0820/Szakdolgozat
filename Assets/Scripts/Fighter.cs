@@ -11,11 +11,13 @@ public class Fighter : MonoBehaviour
     float lastClickedTime = 0;
     double maxComboDelay = 1.55;
     private Collider swordCollider;
- 
+    private PlayerController playerController;
+
     private void Start()
     {
         anim = GetComponent<Animator>();
         swordCollider = GetComponentInChildren<MeshCollider>();
+        playerController = GetComponent<PlayerController>();
         if (swordCollider != null)
 {
     swordCollider.enabled = false;
@@ -70,6 +72,7 @@ else
     void OnClick()
     {
         //so it looks at how many clicks have been made and if one animation has finished playing starts another one.
+        if (playerController.currentStamina < 15) return;
         lastClickedTime = Time.time;
         noOfClicks++;
         noOfClicks = Mathf.Clamp(noOfClicks, 0, 3);
@@ -115,6 +118,8 @@ else
     }
     public void EnableHitbox()
     {
+        playerController.DrainStamina(15);
+
         swordCollider.enabled = true;
         hitEnemies.Clear(); // Reset hit list when attack starts
     }

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerRoll : MonoBehaviour
 {
@@ -12,18 +13,21 @@ public class PlayerRoll : MonoBehaviour
     private Collider playerCollider;          // Reference to the player's collider
     public bool isInvincible = false;  
     private Vector3 rollDirection;
-    public Camera playerCamera;         // Whether the player is invincible during the roll
+    public Camera playerCamera;
+    public float rollStaminaCost = 25f;
+    private PlayerController playerController;
 
-    void Start()
+void Start()
     {
         anim = GetComponent<Animator>();
-        playerCollider = GetComponent<Collider>();  // Assuming the player has a collider
+        playerCollider = GetComponent<Collider>();
+        playerController = GetComponent<PlayerController>();// Assuming the player has a collider
     }
 
     void Update()
     {
         // If the player presses the roll button and is allowed to roll, trigger the roll
-        if (Input.GetKeyDown(KeyCode.Space) && canRoll && !isRolling)
+        if (Input.GetKeyDown(KeyCode.Space) && canRoll && !isRolling && playerController.currentStamina >= rollStaminaCost)
         {
             StartCoroutine(Roll());
         }
@@ -43,6 +47,7 @@ public class PlayerRoll : MonoBehaviour
 
         // Make the player invincible during the roll
         //DetermineRollDirection();
+        playerController.DrainStamina(rollStaminaCost);
 
         FaceCameraDirection();
         // Trigger the roll animation
