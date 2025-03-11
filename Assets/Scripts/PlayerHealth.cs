@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class PlayerHealth : MonoBehaviour
 {
     public float maxHealth = 100f;        // Maximum health
-    private float currentHealth;          // Current health
+    public float currentHealth;          // Current health
     public Slider healthSlider;           // Health slider (UI element)
     public Image healthFillImage;         // Health fill image (to change color)
     public Color healthyColor = Color.green;
@@ -81,12 +81,35 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log("Player Died!");
         healthFillImage.enabled = false;
         fight.DisableHitbox();
-        controller.anim.SetTrigger("IsDead");
+        controller.anim.SetTrigger("IsDead"); 
         this.enabled = false;
         controller.enabled=false;
         roll.enabled=false;
         fight.enabled=false;
+        Respawn();
         //GetComponent<Collider>().enabled = false;
         // Handle death (Disable player controls, play death animation, etc.)
+    }
+    private void Respawn()
+    {
+        Vector3 respawnPos = CheckpointManager.instance.GetRespawnPosition();
+        if (respawnPos != Vector3.zero)
+        {
+            transform.position = respawnPos;
+            currentHealth = maxHealth; // Restore health
+            healthSlider.value=maxHealth;
+            Debug.Log("Player Respawned at Checkpoint");
+            this.enabled = true;
+            controller.enabled = true;
+            roll.enabled = true;
+            fight.enabled = true;
+            healthFillImage.enabled = true;
+            isDead = false;
+            controller.anim.SetTrigger("IsRespawned");
+        }
+        else
+        {
+            Debug.Log("No checkpoint set, respawning at default position.");
+        }
     }
 }

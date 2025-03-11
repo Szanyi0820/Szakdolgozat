@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour
         currentStamina = maxStamina;
         if (staminaBar)
             staminaBar.maxValue = maxStamina;
+            staminaBar.value = maxStamina;
         //rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         //key.gameObject.SetActive(false);
         //VictoryText.gameObject.SetActive(false);

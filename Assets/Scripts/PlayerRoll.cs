@@ -49,7 +49,7 @@ void Start()
         //DetermineRollDirection();
         playerController.DrainStamina(rollStaminaCost);
 
-        FaceCameraDirection();
+        
         // Trigger the roll animation
         //anim.SetTrigger("RollForward");
 
@@ -60,12 +60,17 @@ void Start()
 
         float startTime = Time.time;
         Vector3 rollDirection = DetermineRollDirection();
+        
         TriggerRollAnimation();
+        
+
 
         // Move the player during the roll
         while (Time.time - startTime < 0.5f)  // Adjust this duration based on your roll animation length
         {
+            
             transform.Translate(rollDirection * rollSpeed * Time.deltaTime, Space.World);
+            FaceCameraDirection();
             yield return null;
         }
 
