@@ -33,7 +33,7 @@ public class AIController : MonoBehaviour
     float m_TimeToRotate;
     bool m_PlayerInRange;
     bool m_PlayerNear;
-    bool m_IsPatrol;
+    public bool m_IsPatrol;
     bool m_CaughtPlayer;
     bool alreadyHit;
 
@@ -67,14 +67,30 @@ public class AIController : MonoBehaviour
     }
     void Update()
     {
-        EnviromentView();
-        if(!m_IsPatrol)
+       if (!enemyScript.IsDead())  // Prevent movement if dead
         {
-            Chasing();
+            EnviromentView();
+            if (!m_IsPatrol)
+            {
+                Chasing();
+            }
+            else
+            {
+                Patroling();
+            }
         }
-        else
+    }
+    public bool IsAggroed()
+{
+    return !m_IsPatrol; // If the enemy is not patrolling, it's chasing or attacking
+}
+public void Aggro(Vector3 playerPosition)
+    {
+        if (m_IsPatrol)  // Only change state if currently patrolling
         {
-            Patroling();
+            m_IsPatrol = false;
+            m_PlayerPosition = playerPosition;
+            Debug.Log("Enemy is now aggroed!");
         }
     }
     private void FaceTarget(Vector3 targetPosition)
@@ -149,7 +165,6 @@ public class AIController : MonoBehaviour
     {
         // Player is outside of stopping distance, continue moving towards the player
         anim.SetBool("IsWalking", true);
-        Debug.Log("Called");
         m_CaughtPlayer=false; // Set walking animation to true
         navMeshAgent.isStopped = false; // Resume movement
         navMeshAgent.SetDestination(m_PlayerPosition);
@@ -188,8 +203,8 @@ public class AIController : MonoBehaviour
         }
         else
         {
-            m_PlayerNear=false;
-            m_PlayerLastPosition=Vector3.zero;
+            /*m_PlayerNear=false;
+            m_PlayerLastPosition=Vector3.zero;*/
             navMeshAgent.SetDestination(waypoints[m_CurrentWaypointIndex].position);
             if(navMeshAgent.remainingDistance<=navMeshAgent.stoppingDistance)
             {
@@ -249,6 +264,22 @@ public class AIController : MonoBehaviour
             }
         }
     }
+    /*void EnviromentView()
+    {
+        Collider[] PlayerInRange = Physics.OverlapSphere(transform.position, viewRadius, playerMask);
+        foreach (var player in PlayerInRange)
+        {
+            Vector3 dirToPlayer = (player.transform.position - transform.position).normalized;
+            if (Vector3.Angle(transform.forward, dirToPlayer) < viewAngle / 2)
+            {
+                float dsToPlayer = Vector3.Distance(transform.position, player.transform.position);
+                if (!Physics.Raycast(transform.position, dirToPlayer, dsToPlayer, obstacleMask))
+                {
+                    Aggro(player.transform.position);
+                }
+            }
+        }
+    }*/
     void EnviromentView()
     {
         Collider[] PlayerInRange=Physics.OverlapSphere(transform.position,viewRadius,playerMask);

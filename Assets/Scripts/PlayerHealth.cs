@@ -14,6 +14,10 @@ public class PlayerHealth : MonoBehaviour
     private PlayerController controller;
     private Fighter fight;
     private PlayerRoll roll;
+    public DeathScreenManager deathScreen;
+    public RectTransform healthSliderTransform; // Reference to the UI bar RectTransform
+    public float healthIncreaseAmount = 20f; // How much max HP increases per level-up
+    public float healthBarIncreaseSize = 20f;
 
     public bool isDead = false;
 
@@ -27,6 +31,7 @@ public class PlayerHealth : MonoBehaviour
         healthFillImage.color = healthyColor;
         UpdateHealthBar();
         healthSlider.value = currentHealth;
+        deathScreen = FindObjectOfType<DeathScreenManager>();
     }
 
     void Update()
@@ -58,12 +63,22 @@ public class PlayerHealth : MonoBehaviour
         // Optionally, you can also play a hurt animation or sound here
         Debug.Log("Took damage: " + damage);
     }
-    void UpdateHealthBar()
+    public void UpdateHealthBar()
     {
         if (healthSlider != null)
         {
-            healthSlider.value = currentHealth / maxHealth; // Normalize health (0 to 1)
+            healthSlider.value = currentHealth; // Normalize health (0 to 1)
         }
+    }
+    public void UpdateHealthBarSize()
+    {
+        if (healthSliderTransform != null)
+    {
+        float expansionAmount = 20f; // Adjust expansion amount as needed
+        Vector2 newSize = healthSliderTransform.sizeDelta;
+        newSize.x += expansionAmount; // Only grow width, not height
+        healthSliderTransform.sizeDelta = newSize;
+    }
     }
 
     public void Heal(float healAmount)
@@ -86,7 +101,8 @@ public class PlayerHealth : MonoBehaviour
         controller.enabled=false;
         roll.enabled=false;
         fight.enabled=false;
-        Respawn();
+        deathScreen.ShowDeathScreen();
+        //Respawn();
         //GetComponent<Collider>().enabled = false;
         // Handle death (Disable player controls, play death animation, etc.)
     }
@@ -95,6 +111,7 @@ public class PlayerHealth : MonoBehaviour
         Vector3 respawnPos = CheckpointManager.instance.GetRespawnPosition();
         if (respawnPos != Vector3.zero)
         {
+            controller.anim.SetTrigger("IsRespawned");
             transform.position = respawnPos;
             currentHealth = maxHealth; // Restore health
             healthSlider.value=maxHealth;
@@ -105,7 +122,7 @@ public class PlayerHealth : MonoBehaviour
             fight.enabled = true;
             healthFillImage.enabled = true;
             isDead = false;
-            controller.anim.SetTrigger("IsRespawned");
+            
         }
         else
         {

@@ -12,6 +12,7 @@ public class Fighter : MonoBehaviour
     double maxComboDelay = 1.55;
     private Collider swordCollider;
     private PlayerController playerController;
+    public int damage=30;
 
     private void Start()
     {
@@ -113,7 +114,7 @@ else
         {
             hitEnemies.Add(other.gameObject);
             Debug.Log("Hit Enemy!");
-            other.GetComponent<Enemy>().TakeDamage(30); // Call damage function
+            other.GetComponent<Enemy>().TakeDamage(damage); // Call damage function
         }
     }
     public void EnableHitbox()
