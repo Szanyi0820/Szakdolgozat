@@ -19,12 +19,14 @@ public class PlayerLevel : MonoBehaviour
     private PlayerHealth playerHealth;
     private PlayerStamina playerStamina;
     private Fighter playerFighter;
+    private PlayerInventory playerInventory;
 
     void Start()
     {
         playerHealth = GetComponent<PlayerHealth>();
         playerStamina = GetComponent<PlayerStamina>();
         playerFighter = GetComponent<Fighter>();
+        playerInventory=GetComponent<PlayerInventory>();
         UpdateUI();
     }
 
@@ -46,16 +48,24 @@ public class PlayerLevel : MonoBehaviour
             {
                 case "Strength":
                     strength += 1;
-                    playerFighter.damage += 5; // Increase base damage
+                    playerInventory.strength+=5; // Increase base damage
                     break;
                 case "Dexterity":
                     dexterity += 1;
+                    playerInventory.dexterity+=5;
                     // In the future, boost dex-based weapons here
                     break;
                 case "Endurance":
-                    endurance += 1;
-                    playerStamina.maxStamina += 10; // Increase stamina
-                    break;
+                endurance += 1;
+                playerStamina.maxStamina += 10;  // Increase max stamina
+                playerStamina.stamina += 10;     // Increase current stamina
+                /*playerStamina.staminaBar.maxValue = playerStamina.maxStamina; // Update slider max value
+                playerStamina.staminaBar.value = playerStamina.maxStamina;*/
+                playerStamina.UpdateStaminaUI(); 
+                playerStamina.UpdateStaminaBarSize();
+                 // Update UI to reflect new stamina value
+                  // Adjust the stamina bar to reflect max and current stamina
+                break;
                 case "Vitality":
                     vitality += 1;
                     playerHealth.maxHealth += 20; // Increase health

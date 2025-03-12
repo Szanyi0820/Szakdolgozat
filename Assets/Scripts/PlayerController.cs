@@ -143,6 +143,7 @@ private bool CanMove()
                 staminaBar.value = currentStamina;
         }
     }
+    
 
 
 }

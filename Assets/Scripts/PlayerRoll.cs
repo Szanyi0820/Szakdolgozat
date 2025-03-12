@@ -171,6 +171,9 @@ void Start()
         {
             anim.SetTrigger("RollLeft");
         }
+        else{
+            anim.SetTrigger("RollForward");
+        }
     }
 
     // Call this function to detect if the player is hit (you would typically call this in a OnCollisionEnter or OnTriggerEnter)

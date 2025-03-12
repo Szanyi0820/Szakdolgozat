@@ -18,14 +18,16 @@ public class PlayerStamina : MonoBehaviour
     public float rollCost = 25f;
 
     [Header("Stamina UI (Optional)")]
-    public Slider staminaBar;  // UI bar to show stamina (optional)
+    public Slider staminaBar;
+    public RectTransform staminaSliderTransform;  // UI bar to show stamina (optional)
 
     private bool isSprinting = false;
     private bool isRegenerating = false;
 
     private void Start()
     {
-        stamina = maxStamina; // Start with full stamina
+        stamina = maxStamina;
+        staminaBar.value=stamina; // Start with full stamina
     }
 
     private void Update()
@@ -102,12 +104,22 @@ public class PlayerStamina : MonoBehaviour
     }
 
     // Optional UI Update
-    private void UpdateStaminaUI()
+    public void UpdateStaminaUI()
     {
         if (staminaBar != null) // Ensure the staminaBar is assigned
         {
-            staminaBar.value = stamina / maxStamina; // Set the slider value
+            staminaBar.value = maxStamina; // Set the slider value
         }
+    }
+    public void UpdateStaminaBarSize()
+    {
+        if (staminaSliderTransform != null)
+    {
+        float expansionAmount = 20f; // Adjust expansion amount as needed
+        Vector2 newSize = staminaSliderTransform.sizeDelta;
+        newSize.x += expansionAmount; // Only grow width, not height
+        staminaSliderTransform.sizeDelta = newSize;
+    }
     }
 
     // Example Roll Coroutine (Updated to Use Stamina System)
