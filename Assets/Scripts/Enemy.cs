@@ -13,21 +13,12 @@ public class Enemy : MonoBehaviour
     private AIController controller;
     private void Start()
     {
-        // Get the Animator component when the script starts
         anim = GetComponent<Animator>();
         currentHealth = maxHealth;
         healthBar = GetComponentInChildren<HealthBar>(); // Find health bar in child
         healthBar.SetMaxHealth(maxHealth);
         controller = GetComponent<AIController>();
     }
-    // Start is called before the first frame update
-    public bool IsDead()
-{
-    return currentHealth <= 0;
-}
-    
-    
-
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
@@ -44,7 +35,6 @@ public class Enemy : MonoBehaviour
             Die();
         }
         StartCoroutine(StunEnemy());
-        
     }
     private IEnumerator StunEnemy()
 {
@@ -61,7 +51,10 @@ public class Enemy : MonoBehaviour
     anim.speed = 1f; 
     Debug.Log("Enemy can attack again.");
 }
-
+   public bool IsDead()
+{
+    return currentHealth <= 0;
+}
     void Die()
     {
         Debug.Log("Enemy Died!");

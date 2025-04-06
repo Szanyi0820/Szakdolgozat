@@ -35,6 +35,7 @@ public class PlayerStamina : MonoBehaviour
         HandleSprinting();
         HandleStaminaRegen();
         UpdateStaminaUI(); // Optional UI update
+        
     }
 
     // Handles sprinting and stamina drain
@@ -72,19 +73,6 @@ public class PlayerStamina : MonoBehaviour
         }
         return false; // Not enough stamina
     }
-
-    // Roll function that uses stamina
-    /*public bool TryRoll()
-    {
-        if (stamina >= rollCost)
-        {
-            DrainStamina(rollCost);
-            StartCoroutine(Roll()); // Call roll coroutine
-            return true; // Allow roll
-        }
-        return false; // Not enough stamina
-    }*/
-
     // Drain stamina and reset regen timer
     private void DrainStamina(float amount)
     {
@@ -108,7 +96,8 @@ public class PlayerStamina : MonoBehaviour
     {
         if (staminaBar != null) // Ensure the staminaBar is assigned
         {
-            staminaBar.value = maxStamina; // Set the slider value
+            staminaBar.value = maxStamina;
+            UpdateStaminaBarSize(); // Set the slider value
         }
     }
     public void UpdateStaminaBarSize()
